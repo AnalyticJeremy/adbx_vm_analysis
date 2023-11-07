@@ -28,12 +28,12 @@ This command will return the results in JSON format.  You can copy those results
 should be ready to go!
 
 ## Phase 1: Data Acquisition
-Run the "Acquire Data" notebook.  This will query the Azure Activity Log and get VM operation information from the
+Run the "[Acquire Data](Acquire%20Data.ipynb)" notebook.  This will query the Azure Activity Log and get VM operation information from the
 Databricks-managed resource groups.  The data will be saved as raw JSON files.  The notebook will then transform
-this data in various phases and create a tiny little Delta lake with bronze, silver, and gold layers.
+this data in various phases and create a tiny little Delta lakehouse with bronze, silver, and gold layers.
 
 ## Phase 2: Data Analysis
-The second notebook, "Analyze Data," will read the data acquired in the previous phase.  It will summarize VM usage
+The second notebook, "[Analyze Data](Analyze%20Data.ipynb)", will read the data acquired in the previous phase.  It will summarize VM usage
 by job and by VM SKU.  You can use this data to better understand your VM usage patterns and determine how to optimize
 your Databricks Instance Pool size.
 
@@ -46,3 +46,20 @@ For this analysis, we are primarialy concerned with creating pools for resilienc
 on to them as long as possible so that in the event of an incident with the Azure VM service, we will already have the VM's that we
 need.  So the question we are trying to answer is:  How many VM's should I keep on-hand to be able to run my jobs in the event of
 an Azure incident?
+
+**My organization won't allow me to create a service principal.  Is there any other way I can authenticate to the Azure API?**
+
+Using service principals is the preferred method for authenticating to the Azure API.  However, if that is not an option, you
+can go another route.  If your organization allows you to use the "device code flow" with Microsoft Entra ID, then you can use
+your own credentials to authenticate.  To do this, you will need to create a new cell in the "Acquire Data.ipynb" notebook and
+add the following code:
+
+```
+%sh
+az login --use-device-code
+```
+
+When you run this cell, you will be given a URL.  Open that URL in your laptop's browser, and login with your credentials.  Entra will
+store your authentication token on the Databricks cluster's driver node.  It can then be used to authenticate the Azure API calls.
+In Cell 7 of the "Acquire Data" notebook, you will have to comment out the line that calls `ClientSecretCredential` and uncomment
+the line that calls `AzureCliCredential`.
