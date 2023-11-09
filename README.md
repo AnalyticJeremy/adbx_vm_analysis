@@ -56,10 +56,12 @@ add the following code:
 
 ```
 %sh
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 az login --use-device-code
 ```
 
-When you run this cell, you will be given a URL.  Open that URL in your laptop's browser, and login with your credentials.  Entra will
-store your authentication token on the Databricks cluster's driver node.  It can then be used to authenticate the Azure API calls.
-In Cell 7 of the "Acquire Data" notebook, you will have to comment out the line that calls `ClientSecretCredential` and uncomment
-the line that calls `AzureCliCredential`.
+When you run this cell, it will install the Azure CLI on the cluster's driver node.  When the `az login` command is run, you will be
+given a URL and a code.  Open that URL in your laptop's browser, enter the code you were given, and login with your credentials.
+Entra will store your authentication token on the Databricks cluster's driver node.  It can then be used to authenticate the
+Azure API calls.  In Cell 7 of the "Acquire Data" notebook, you will have to comment out the line that calls `ClientSecretCredential`
+and uncomment the line that calls `AzureCliCredential`.
